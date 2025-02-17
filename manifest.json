@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Go Back to Previous Tab",
+  "version": "1.0",
+  "description": "Go back to the previous tab using Alt + Q",
+  "permissions": [
+    "tabs",
+    "activeTab"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "go-back-to-previous-tab": {
+      "suggested_key": {
+        "default": "Alt+Q"
+      },
+      "description": "Go back to the previous tab"
+    }
+  }
+}
