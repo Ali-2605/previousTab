@@ -1,23 +1,28 @@
-let tabArray = [];
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    let storedTabs = await chrome.storage.session.get("tabArray");
+    let tabArray = storedTabs.tabArray || [];
 
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.query({}, (tabs) => {
-    // Store the active tab and the previous tab in the array
-    let currentTab = tabs.find(tab => tab.id === activeInfo.tabId);
-    let previousTab = tabArray[0]; // Get the last tab from the array
+    chrome.tabs.query({}, async (tabs) => {
+        let currentTab = tabs.find(tab => tab.id === activeInfo.tabId);
+        let previousTab = tabArray[0]; // Get the last tab from storage
 
-    if (currentTab) {
-      tabArray = [currentTab, previousTab]; // Update the tabArray with current and previous tabs
-    }
-  });
+        if (currentTab) {
+            tabArray = [currentTab, previousTab]; // Update stored tabs
+
+            // Save to chrome.storage.session
+            await chrome.storage.session.set({ tabArray });
+        }
+    });
 });
 
 // Listen for the Alt+Q keyboard shortcut
-chrome.commands.onCommand.addListener((command) => {
-  if (command === 'go-back-to-previous-tab') {
-    // Switch to the last tab in the array (tabArray[1])
-    if (tabArray[1]) {
-      chrome.tabs.update(tabArray[1].id, { active: true });
+chrome.commands.onCommand.addListener(async (command) => {
+    if (command === 'go-back-to-previous-tab') {
+        let storedTabs = await chrome.storage.session.get("tabArray");
+        let tabArray = storedTabs.tabArray || [];
+
+        if (tabArray[1]) {
+            chrome.tabs.update(tabArray[1].id, { active: true });
+        }
     }
-  }
 });
